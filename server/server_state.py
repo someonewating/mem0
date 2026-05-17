@@ -80,7 +80,11 @@ def initialize_state(default_config: Dict[str, Any]) -> None:
         overrides = _load_overrides()
         if overrides:
             _current_config = _merge_config(_current_config, overrides)
-        _memory_instance = Memory.from_config(_current_config)
+        try:
+            _memory_instance = Memory.from_config(_current_config)
+        except Exception as e:
+            logging.error(f"Failed to initialize Memory: {e}")
+            _memory_instance = None
 
 
 def update_config(updates: Dict[str, Any]) -> Dict[str, Any]:

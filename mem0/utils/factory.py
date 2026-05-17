@@ -99,7 +99,8 @@ class LlmFactory:
                     "top_k": config.top_k,
                     "enable_vision": config.enable_vision,
                     "vision_details": config.vision_details,
-                    "http_client_proxies": config.http_client,
+                    "reasoning_effort": config.reasoning_effort,
+                    "http_client_proxies": config.http_client_proxies,
                 }
                 config_dict.update(kwargs)
                 config = config_class(**config_dict)

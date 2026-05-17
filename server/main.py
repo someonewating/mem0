@@ -106,9 +106,34 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD") or "postgres"
 POSTGRES_COLLECTION_NAME = os.environ.get("POSTGRES_COLLECTION_NAME") or "memories"
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GEMINI_BASE_URL = os.environ.get("GEMINI_BASE_URL")
+
 HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH") or "/app/history/history.db"
 DEFAULT_LLM_MODEL = os.environ.get("MEM0_DEFAULT_LLM_MODEL") or "gpt-4.1-nano-2025-04-14"
 DEFAULT_EMBEDDER_MODEL = os.environ.get("MEM0_DEFAULT_EMBEDDER_MODEL") or "text-embedding-3-small"
+
+# Set up providers and configs based on available keys
+llm_provider = "openai"
+llm_config = {"api_key": OPENAI_API_KEY, "temperature": 0.2, "model": DEFAULT_LLM_MODEL}
+
+embedder_provider = "openai"
+embedder_config = {"api_key": OPENAI_API_KEY, "model": DEFAULT_EMBEDDER_MODEL}
+
+if not OPENAI_API_KEY and GOOGLE_API_KEY:
+    llm_provider = "gemini"
+    llm_config = {
+        "api_key": GOOGLE_API_KEY,
+        "temperature": 0.2,
+        "model": "gemini-2.0-flash",
+        "gemini_base_url": GEMINI_BASE_URL,
+    }
+    embedder_provider = "gemini"
+    embedder_config = {
+        "api_key": GOOGLE_API_KEY,
+        "model": "models/gemini-embedding-001",
+        "gemini_base_url": GEMINI_BASE_URL,
+    }
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -124,10 +149,10 @@ DEFAULT_CONFIG = {
         },
     },
     "llm": {
-        "provider": "openai",
-        "config": {"api_key": OPENAI_API_KEY, "temperature": 0.2, "model": DEFAULT_LLM_MODEL},
+        "provider": llm_provider,
+        "config": llm_config,
     },
-    "embedder": {"provider": "openai", "config": {"api_key": OPENAI_API_KEY, "model": DEFAULT_EMBEDDER_MODEL}},
+    "embedder": {"provider": embedder_provider, "config": embedder_config},
     "history_db_path": HISTORY_DB_PATH,
 }
 
