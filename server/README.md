@@ -52,7 +52,7 @@ cd server
 make up
 ```
 
-Then open `http://localhost:3000` and complete the setup wizard.
+Then open `http://localhost:3001` and complete the setup wizard.
 
 ## Security Defaults
 
@@ -86,7 +86,7 @@ Wire the command into cron or a systemd timer in production. The `created_at` co
 
 ## Local URLs
 
-- Dashboard: `http://localhost:3000`
+- Dashboard: `http://localhost:3001`
 - API: `http://localhost:8888`
 - OpenAPI docs: `http://localhost:8888/docs`
 

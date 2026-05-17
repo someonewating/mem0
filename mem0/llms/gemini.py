@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 try:
     from google import genai
@@ -8,18 +8,45 @@ except ImportError:
     raise ImportError("The 'google-genai' library is required. Please install it using 'pip install google-genai'.")
 
 from mem0.configs.llms.base import BaseLlmConfig
+from mem0.configs.llms.gemini import GeminiConfig
 from mem0.llms.base import LLMBase
 
 
 class GeminiLLM(LLMBase):
-    def __init__(self, config: Optional[BaseLlmConfig] = None):
+    def __init__(self, config: Optional[Union[BaseLlmConfig, GeminiConfig, Dict]] = None):
+        # Convert to GeminiConfig if needed
+        if config is None:
+            config = GeminiConfig()
+        elif isinstance(config, dict):
+            config = GeminiConfig(**config)
+        elif isinstance(config, BaseLlmConfig) and not isinstance(config, GeminiConfig):
+            # Convert BaseLlmConfig to GeminiConfig
+            config = GeminiConfig(
+                model=config.model,
+                temperature=config.temperature,
+                api_key=config.api_key,
+                max_tokens=config.max_tokens,
+                top_p=config.top_p,
+                top_k=config.top_k,
+                enable_vision=config.enable_vision,
+                vision_details=config.vision_details,
+                reasoning_effort=getattr(config, "reasoning_effort", None),
+                http_client_proxies=config.http_client,
+            )
+
         super().__init__(config)
 
         if not self.config.model:
             self.config.model = "gemini-2.0-flash"
 
         api_key = self.config.api_key or os.getenv("GOOGLE_API_KEY")
-        self.client = genai.Client(api_key=api_key)
+        base_url = self.config.gemini_base_url or os.getenv("GEMINI_BASE_URL")
+
+        http_options = None
+        if base_url:
+            http_options = types.HttpOptions(base_url=base_url)
+
+        self.client = genai.Client(api_key=api_key, http_options=http_options)
 
     def _parse_response(self, response, tools):
         """

@@ -8,8 +8,10 @@ export class GoogleEmbedder implements Embedder {
   private embeddingDims: number | undefined;
 
   constructor(config: EmbeddingConfig) {
+    const baseURL = config.baseURL || process.env.GEMINI_BASE_URL;
     this.google = new GoogleGenAI({
       apiKey: config.apiKey || process.env.GOOGLE_API_KEY,
+      ...(baseURL && { httpOptions: { baseUrl: baseURL } }),
     });
     this.model = config.model || "gemini-embedding-001";
     this.embeddingDims = config.embeddingDims;

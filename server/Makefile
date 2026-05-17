@@ -2,10 +2,10 @@
 
 OUTPUT ?= text
 API_URL ?= http://localhost:8888
-DASHBOARD_URL ?= http://localhost:3000
+DASHBOARD_URL ?= http://localhost:3001
 
 up:
-	@for port in 3000 8888; do \
+	@for port in 3001 8888; do \
 		if lsof -iTCP:$$port -sTCP:LISTEN >/dev/null 2>&1; then \
 			echo "error: port $$port is already in use."; \
 			echo "find the owning process with: lsof -iTCP:$$port -sTCP:LISTEN"; \
@@ -33,12 +33,12 @@ seed:
 	@API_URL="$(API_URL)" DASHBOARD_URL="$(DASHBOARD_URL)" EMAIL="$(EMAIL)" PASSWORD="$(PASSWORD)" NAME="$(NAME)" OUTPUT="$(OUTPUT)" ./scripts/seed.sh
 
 wait-api:
-	@echo "Waiting for API..."
-	@until curl -fsS "$(API_URL)/auth/setup-status" >/dev/null 2>&1; do sleep 2; done
+	@echo "Waiting for API (timeout 60s)..."
+	@timeout 60s sh -c 'until curl -fsS "$(API_URL)/auth/setup-status" >/dev/null 2>&1; do sleep 2; done' || (echo "API failed to start within 60s" && exit 1)
 
 wait-dashboard:
-	@echo "Waiting for dashboard..."
-	@until curl -fsS "$(DASHBOARD_URL)/api/health" >/dev/null 2>&1; do sleep 2; done
+	@echo "Waiting for dashboard (timeout 60s)..."
+	@timeout 60s sh -c 'until curl -fsS "$(DASHBOARD_URL)/api/health" >/dev/null 2>&1; do sleep 2; done' || (echo "Dashboard failed to start within 60s" && exit 1)
 
 bootstrap: up wait-api wait-dashboard seed
 

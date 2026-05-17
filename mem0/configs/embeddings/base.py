@@ -34,6 +34,7 @@ class BaseEmbedderConfig(ABC):
         memory_search_embedding_type: Optional[str] = None,
         # Gemini specific
         output_dimensionality: Optional[str] = None,
+        gemini_base_url: Optional[str] = None,
         # LM Studio specific
         lmstudio_base_url: Optional[str] = "http://localhost:1234/v1",
         # AWS Bedrock specific
@@ -99,6 +100,7 @@ class BaseEmbedderConfig(ABC):
 
         # Gemini specific
         self.output_dimensionality = output_dimensionality
+        self.gemini_base_url = gemini_base_url
 
         # LM Studio specific
         self.lmstudio_base_url = lmstudio_base_url

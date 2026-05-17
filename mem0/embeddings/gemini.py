@@ -16,8 +16,13 @@ class GoogleGenAIEmbedding(EmbeddingBase):
         self.config.embedding_dims = self.config.embedding_dims or self.config.output_dimensionality or 768
 
         api_key = self.config.api_key or os.getenv("GOOGLE_API_KEY")
+        base_url = self.config.gemini_base_url or os.getenv("GEMINI_BASE_URL")
 
-        self.client = genai.Client(api_key=api_key)
+        http_options = None
+        if base_url:
+            http_options = types.HttpOptions(base_url=base_url)
+
+        self.client = genai.Client(api_key=api_key, http_options=http_options)
 
     def embed(self, text, memory_action: Optional[Literal["add", "search", "update"]] = None):
         """

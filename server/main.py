@@ -71,7 +71,7 @@ def _warn_if_unconfigured() -> None:
         "  Auth is enabled by default and this server has no admin configured.\n"
         "  Protected endpoints will return 401 until you either:\n"
         "    1. Set ADMIN_API_KEY=<long-random-value>  (fastest, no client changes)\n"
-        "    2. Register an admin at http://<host>:3000/setup\n"
+        "    2. Register an admin at http://<host>:3001/setup\n"
         "    3. Set AUTH_DISABLED=true                 (local development only)\n"
         "  Docs: https://docs.mem0.ai/open-source/features/rest-api#authentication\n"
         "%s",
@@ -98,17 +98,17 @@ elif not ADMIN_API_KEY:
 
 telemetry.log_status()
 
-POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
-POSTGRES_PORT = os.environ.get("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.environ.get("POSTGRES_DB", "postgres")
-POSTGRES_USER = os.environ.get("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
-POSTGRES_COLLECTION_NAME = os.environ.get("POSTGRES_COLLECTION_NAME", "memories")
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST") or "postgres"
+POSTGRES_PORT = os.environ.get("POSTGRES_PORT") or "5432"
+POSTGRES_DB = os.environ.get("POSTGRES_DB") or "postgres"
+POSTGRES_USER = os.environ.get("POSTGRES_USER") or "postgres"
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD") or "postgres"
+POSTGRES_COLLECTION_NAME = os.environ.get("POSTGRES_COLLECTION_NAME") or "memories"
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH", "/app/history/history.db")
-DEFAULT_LLM_MODEL = os.environ.get("MEM0_DEFAULT_LLM_MODEL", "gpt-4.1-nano-2025-04-14")
-DEFAULT_EMBEDDER_MODEL = os.environ.get("MEM0_DEFAULT_EMBEDDER_MODEL", "text-embedding-3-small")
+HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH") or "/app/history/history.db"
+DEFAULT_LLM_MODEL = os.environ.get("MEM0_DEFAULT_LLM_MODEL") or "gpt-4.1-nano-2025-04-14"
+DEFAULT_EMBEDDER_MODEL = os.environ.get("MEM0_DEFAULT_EMBEDDER_MODEL") or "text-embedding-3-small"
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -150,7 +150,7 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_exception_handler(UpstreamError, upstream_error_handler)
-DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "http://localhost:3000")
+DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "http://localhost:3001")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[DASHBOARD_URL],
